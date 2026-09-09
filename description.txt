@@ -1,0 +1,1 @@
+Extensão Chrome para ler seleções ou páginas em voz alta com a API OpenAI. Leitura contínua, destaque e rolagem por frases, controle de voz e velocidade, cache local para reduzir custos e interface Floresta. Instalação local, sem servidor intermediário.
