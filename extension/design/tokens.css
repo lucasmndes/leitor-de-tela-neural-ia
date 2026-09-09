@@ -1,0 +1,265 @@
+/*
+  Sistema Modular Vivo — Design Tokens v1.0
+  Base neutra, pessoal, editorial e reutilizável.
+*/
+
+:root {
+  /* =========================================================
+     1. CORES PRIMITIVAS
+     ========================================================= */
+  --color-petroleum-900: #0E352A;
+  --color-petroleum-800: #134B3A;
+  --color-forest-700: #205E45;
+  --color-forest-600: #2C7557;
+  --color-olive-600: #708A48;
+  --color-sage-400: #A8C686;
+  --color-mint-300: #BFE7CF;
+  --color-mint-200: #DDF2E5;
+  --color-teal-500: #5C9E95;
+  --color-blue-gray-300: #AFC8C8;
+  --color-coral-500: #F47C62;
+  --color-orange-600: #F06A2A;
+  --color-mustard-400: #F4C96A;
+  --color-brown-800: #4A3027;
+  --color-cream-200: #F5EEDB;
+  --color-offwhite-100: #F8F5EC;
+  --color-paper-0: #FFFDF7;
+  --color-white: #FFFFFF;
+  --color-black: #111815;
+
+  /* Neutros derivados */
+  --color-ink-900: #183126;
+  --color-ink-700: #334C41;
+  --color-ink-600: #52675E;
+  --color-ink-400: #819188;
+  --color-line-300: #D9DDCF;
+  --color-line-200: #E6E8DE;
+  --color-line-100: #EFF0E9;
+
+  /* Estados */
+  --color-success-600: #267A4C;
+  --color-success-100: #E2F2E8;
+  --color-warning-700: #8A5A13;
+  --color-warning-100: #FFF2CC;
+  --color-danger-600: #B84D45;
+  --color-danger-100: #FCE5E2;
+  --color-info-700: #316D75;
+  --color-info-100: #E1F0F2;
+
+  /* =========================================================
+     2. TOKENS SEMÂNTICOS — TEMA CLARO
+     ========================================================= */
+  --bg-canvas: var(--color-offwhite-100);
+  --bg-surface: var(--color-paper-0);
+  --bg-subtle: var(--color-cream-200);
+  --bg-muted: #ECEDE4;
+  --bg-inverse: var(--color-ink-900);
+
+  --text-primary: var(--color-ink-900);
+  --text-secondary: var(--color-ink-600);
+  --text-tertiary: var(--color-ink-400);
+  --text-inverse: var(--color-paper-0);
+
+  --border-default: var(--color-line-300);
+  --border-subtle: var(--color-line-200);
+  --border-strong: var(--color-ink-700);
+
+  --accent-primary: var(--color-forest-700);
+  --accent-primary-hover: var(--color-petroleum-800);
+  --accent-primary-soft: var(--color-mint-200);
+  --accent-secondary: var(--color-orange-600);
+  --accent-secondary-soft: #FCE5D8;
+  --accent-support: var(--color-blue-gray-300);
+  --accent-warm: var(--color-mustard-400);
+
+  --focus-ring: var(--color-orange-600);
+  --selection-bg: var(--color-mint-300);
+  --selection-text: var(--color-petroleum-900);
+
+  /* =========================================================
+     3. PERFIS DE ACENTO
+     ========================================================= */
+  --accent-a: var(--color-forest-700);
+  --accent-b: var(--color-orange-600);
+  --accent-c: var(--color-blue-gray-300);
+  --accent-d: var(--color-mustard-400);
+  --accent-e: var(--color-sage-400);
+
+  /* =========================================================
+     4. TIPOGRAFIA
+     ========================================================= */
+  --font-display: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+  --font-body: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+
+  --font-size-00: 0.6875rem;  /* 11 */
+  --font-size-0: 0.75rem;     /* 12 */
+  --font-size-1: 0.875rem;    /* 14 */
+  --font-size-2: 1rem;        /* 16 */
+  --font-size-3: 1.125rem;    /* 18 */
+  --font-size-4: 1.375rem;    /* 22 */
+  --font-size-5: 1.75rem;     /* 28 */
+  --font-size-6: 2.25rem;     /* 36 */
+  --font-size-7: 3rem;        /* 48 */
+  --font-size-8: 4rem;        /* 64 */
+  --font-size-9: 5.25rem;     /* 84 */
+
+  --line-height-tight: 0.96;
+  --line-height-heading: 1.08;
+  --line-height-body: 1.62;
+  --line-height-loose: 1.78;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 650;
+  --font-weight-bold: 750;
+  --font-weight-black: 850;
+
+  --tracking-tightest: -0.06em;
+  --tracking-tight: -0.035em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.06em;
+  --tracking-wider: 0.12em;
+
+  /* =========================================================
+     5. ESPAÇAMENTO — ESCALA 4/8 COM AJUSTES EDITORIAIS
+     ========================================================= */
+  --space-0: 0;
+  --space-1: 0.25rem;  /* 4 */
+  --space-2: 0.5rem;   /* 8 */
+  --space-3: 0.75rem;  /* 12 */
+  --space-4: 1rem;     /* 16 */
+  --space-5: 1.375rem; /* 22 */
+  --space-6: 1.875rem; /* 30 */
+  --space-7: 2.625rem; /* 42 */
+  --space-8: 3.75rem;  /* 60 */
+  --space-9: 5.5rem;   /* 88 */
+  --space-10: 7.5rem;  /* 120 */
+
+  /* =========================================================
+     6. RAIO, BORDA E SUPERFÍCIE
+     ========================================================= */
+  --radius-0: 0;
+  --radius-xs: 0.625rem;  /* 10 */
+  --radius-sm: 1rem;      /* 16 */
+  --radius-md: 1.5rem;    /* 24 */
+  --radius-lg: 2.125rem;  /* 34 */
+  --radius-xl: 3.25rem;   /* 52 */
+  --radius-pill: 999px;
+
+  --border-width-1: 1px;
+  --border-width-2: 2px;
+  --border-width-4: 4px;
+
+  /* O sistema evita sombras por princípio. */
+  --shadow-none: none;
+
+  /* =========================================================
+     7. LAYOUT
+     ========================================================= */
+  --container-xs: 40rem;
+  --container-sm: 52rem;
+  --container-md: 68rem;
+  --container-lg: 77.5rem;
+  --container-xl: 90rem;
+
+  --content-measure: 68ch;
+  --content-measure-narrow: 46ch;
+  --sidebar-width: 17rem;
+  --header-height: 4.5rem;
+
+  --grid-gap-sm: var(--space-3);
+  --grid-gap-md: var(--space-5);
+  --grid-gap-lg: var(--space-7);
+
+  /* Breakpoints de referência:
+     sm  = 480px
+     md  = 720px
+     lg  = 960px
+     xl  = 1200px
+     2xl = 1440px
+  */
+
+  /* =========================================================
+     8. MOVIMENTO
+     ========================================================= */
+  --duration-fast: 120ms;
+  --duration-base: 220ms;
+  --duration-slow: 420ms;
+  --ease-standard: cubic-bezier(.2,.8,.2,1);
+  --ease-emphasized: cubic-bezier(.2,.9,.2,1.1);
+
+  /* =========================================================
+     9. CAMADAS
+     ========================================================= */
+  --z-base: 0;
+  --z-raised: 10;
+  --z-sticky: 50;
+  --z-overlay: 100;
+  --z-modal: 200;
+}
+
+/* Perfil Verde — padrão */
+[data-accent="forest"] {
+  --accent-primary: var(--color-forest-700);
+  --accent-primary-hover: var(--color-petroleum-800);
+  --accent-primary-soft: var(--color-mint-200);
+  --accent-secondary: var(--color-orange-600);
+  --accent-secondary-soft: #FCE5D8;
+  --accent-a: var(--color-forest-700);
+  --accent-b: var(--color-orange-600);
+  --accent-c: var(--color-blue-gray-300);
+  --accent-d: var(--color-mustard-400);
+  --accent-e: var(--color-sage-400);
+}
+
+/* Perfil Coral — mais humano/editorial */
+[data-accent="coral"] {
+  --accent-primary: var(--color-coral-500);
+  --accent-primary-hover: #D9644F;
+  --accent-primary-soft: #FBE5DE;
+  --accent-secondary: var(--color-forest-700);
+  --accent-secondary-soft: var(--color-mint-200);
+  --accent-a: var(--color-coral-500);
+  --accent-b: var(--color-brown-800);
+  --accent-c: var(--color-blue-gray-300);
+  --accent-d: var(--color-mustard-400);
+  --accent-e: var(--color-mint-300);
+}
+
+/* Perfil Oceano — mais técnico e sóbrio */
+[data-accent="ocean"] {
+  --accent-primary: #397F78;
+  --accent-primary-hover: #2A665F;
+  --accent-primary-soft: #DDEDEC;
+  --accent-secondary: var(--color-mustard-400);
+  --accent-secondary-soft: #FFF3D1;
+  --accent-a: #397F78;
+  --accent-b: var(--color-mustard-400);
+  --accent-c: var(--color-blue-gray-300);
+  --accent-d: var(--color-coral-500);
+  --accent-e: var(--color-sage-400);
+}
+
+/* Tema escuro sem glassmorphism e sem gradientes */
+[data-theme="dark"] {
+  --bg-canvas: #111B17;
+  --bg-surface: #18251F;
+  --bg-subtle: #223129;
+  --bg-muted: #2B3A32;
+  --bg-inverse: var(--color-offwhite-100);
+
+  --text-primary: #F4F1E7;
+  --text-secondary: #B8C4BC;
+  --text-tertiary: #8C9A92;
+  --text-inverse: #16251D;
+
+  --border-default: #3A4A41;
+  --border-subtle: #2B3A32;
+  --border-strong: #D1D9D3;
+
+  --accent-primary-soft: #244C3A;
+  --accent-secondary-soft: #4D3326;
+  --selection-bg: #2C7557;
+  --selection-text: #FFFFFF;
+}
