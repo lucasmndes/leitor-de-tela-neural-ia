@@ -1,0 +1,36 @@
+const {chromium}=require('playwright');
+const fs=require('fs'),http=require('http'),path=require('path'),assert=require('assert');
+function wav(seconds=2){const rate=8000,frames=seconds*rate,b=Buffer.alloc(44+frames*2);b.write('RIFF');b.writeUInt32LE(b.length-8,4);b.write('WAVEfmt ',8);b.writeUInt32LE(16,16);b.writeUInt16LE(1,20);b.writeUInt16LE(1,22);b.writeUInt32LE(rate,24);b.writeUInt32LE(rate*2,28);b.writeUInt16LE(2,32);b.writeUInt16LE(16,34);b.write('data',36);b.writeUInt32LE(frames*2,40);return b;}
+fs.mkdirSync('test-results',{recursive:true});
+(async()=>{
+const root=path.resolve('extension');
+const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+decodeURIComponent(req.url==='/'?'/panel.html':req.url));if(!file.startsWith(root+path.sep)){res.writeHead(403).end();return;}const type={'.js':'text/javascript','.css':'text/css','.html':'text/html','.svg':'image/svg+xml','.png':'image/png'}[path.extname(file)];if(!fs.existsSync(file)){res.writeHead(404).end();return;}res.setHeader('Content-Type',`${type || 'application/octet-stream'}; charset=utf-8`);res.end(fs.readFileSync(file));});
+await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+const browser=await chromium.launch({channel:'chrome',headless:true});const page=await browser.newPage({viewport:{width:390,height:900}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
+await page.addInitScript(()=>{
+const data={apiKey:'sk-local-simulation-not-a-real-secret'},listeners=[];
+const area={async get(keys){return Object.fromEntries((Array.isArray(keys)?keys:[keys]).map(k=>[k,data[k]]));},async set(obj){Object.assign(data,obj)},async remove(key){delete data[key]}};
+const units=Array.from({length:32},(_,i)=>({id:String(i),text:i===0?'A leitura encontra seu próprio ritmo.':i===1?'Um lugar para ouvir, acompanhar e deixar as ideias seguirem.':'Cada frase ganha espaço, enquanto a próxima parte do áudio já está sendo preparada.'}));
+window.chrome={storage:{session:area,local:area,onChanged:{addListener:f=>listeners.push(f)}},tabs:{query:async()=>[{id:1}]},scripting:{insertCSS:async()=>{},executeScript:async options=>[{result:options.files?undefined:options.args[0]==='page'?{session:'test',units}:true,documentId:'test-document'}]}};
+window.sendTestSelection=()=>listeners.forEach(f=>f({pendingSelection:{newValue:{text:'Texto recebido pelo menu.',capture:{session:'menu',units:[{id:'0',text:'Texto recebido pelo menu.'}]},tabId:1,frameId:0,documentId:'doc',nonce:Date.now()}}},'session'));
+});
+let requests=0;
+await page.route('https://api.openai.com/**',route=>{requests++;return route.fulfill({status:200,contentType:'audio/wav',body:wav()})});
+await page.goto(`http://127.0.0.1:${server.address().port}`);
+await page.screenshot({path:'test-results/ui-empty.png',fullPage:true});
+await page.locator('#settingsOpen').click();await page.locator('#key').fill('erro');await page.locator('#save').click();assert.ok((await page.locator('#settingsStatus').innerText()).includes('válida'));await page.locator('#settingsClose').click();
+await page.locator('#page').click();await page.locator('#play').click();await page.waitForFunction(()=>document.querySelector('#preview .active'));
+await page.locator('#pause').click();assert.equal(await page.locator('#pause').innerText(),'Continuar');
+await page.screenshot({path:'test-results/ui-reading.png',fullPage:true});
+await page.locator('#pause').click();await page.waitForFunction(()=>document.querySelector('#status').textContent==='Leitura concluída.');assert.ok(requests<10);assert.equal(await page.locator('#progressValue').innerText(),'100%');
+const firstRequests=requests;
+await page.locator('#play').click();await page.waitForFunction(()=>document.querySelector('#status').textContent==='Leitura concluída.');assert.equal(requests,firstRequests,'Repetir deve usar cache sem nova API');
+await page.reload();await page.locator('#page').click();await page.locator('#play').click();await page.waitForFunction(()=>document.querySelector('#status').textContent==='Leitura concluída.');assert.equal(requests,firstRequests,'Reabrir painel conserva cache IndexedDB');
+await page.locator('#speed').fill('1.5');await page.locator('#speed').dispatchEvent('input');await page.locator('#play').click();await page.waitForFunction(()=>document.querySelector('#status').textContent==='Leitura concluída.');assert.equal(requests,firstRequests,'Ritmo diferente usa o mesmo áudio');
+await page.locator('#settingsOpen').click();await page.locator('#clearAudio').click();await page.waitForFunction(()=>document.querySelector('#settingsStatus').textContent==='Áudios locais removidos.');await page.locator('#settingsClose').click();await page.locator('#play').click();await page.waitForFunction(()=>document.querySelector('#status').textContent==='Leitura concluída.');assert.ok(requests>firstRequests,'Limpar deve invalidar cache');
+await page.evaluate(()=>window.sendTestSelection());assert.equal(await page.locator('#unit-0').innerText(),'Texto recebido pelo menu.');
+await page.setViewportSize({width:320,height:800});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);await page.screenshot({path:'test-results/ui-narrow.png',fullPage:true});
+assert.deepEqual(errors,[]);
+console.log(`PASS: Chrome + IndexedDB + Web Audio; primeira leitura ${firstRequests} chamadas; repetição, reabertura e ritmo sem novas chamadas; limpeza; leitura automática até 100%; layout 320px.`);
+await browser.close();server.close();
+})().catch(e=>{console.error(e);process.exit(1)});
