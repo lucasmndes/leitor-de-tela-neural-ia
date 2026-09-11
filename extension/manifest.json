@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Leitor GPT — leitura em voz alta",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Ouça seleções ou páginas com vozes da OpenAI. Acompanhe a leitura com destaque e rolagem por frases.",
   "minimum_chrome_version": "116",
   "permissions": [

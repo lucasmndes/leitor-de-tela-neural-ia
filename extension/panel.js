@@ -7,13 +7,17 @@ const SPEECH_INSTRUCTIONS='Read verbatim, calmly. Use Brazilian Portuguese for P
 const $=id=>document.getElementById(id);
 const voices=['cedar','marin','alloy','ash','ballad','coral','echo','fable','onyx','nova','sage','shimmer','verse'];
 for(const voice of voices)$('voice').add(new Option(voice[0].toUpperCase()+voice.slice(1),voice));
-let units=[],chunks=[],pageRef=null,reader=null,token=0,running=false,paused=false,currentCue=null,loadSerial=0;
+let units=[],chunks=[],pageRef=null,reader=null,token=0,running=false,paused=false,currentCue=null,loadSerial=0,hasApiKey=false;
 let lastSelection,highlightChain=Promise.resolve();
 const status=text=>{$('status').textContent=text;};
 function controls(){
   $('play').disabled=running || !chunks.length;$('pause').disabled=!running;$('stop').disabled=!running;
-  $('pause').textContent=paused?'Continuar':'Pausar';$('play').hidden=running;$('pause').hidden=!running;
+  $('pauseLabel').textContent=paused?'Continuar':'Pausar';$('pause').setAttribute('aria-label',paused?'Continuar leitura':'Pausar leitura');$('pause').setAttribute('aria-pressed',String(paused));
+  $('play').hidden=running;$('pause').hidden=!running;$('stop').hidden=!running;
+  document.body.dataset.readerState=running?(paused?'paused':'playing'):'idle';
+  $('settingsOpen').classList.toggle('needs-attention',!hasApiKey);$('setupPrompt').hidden=hasApiKey;
 }
+function accessState(available){hasApiKey=Boolean(available);$('keyState').textContent=hasApiKey?'Chave guardada nesta sessão':'Configure sua chave para ouvir';controls();}
 function queuePage(action,cue=null,ref=pageRef,runToken=token) {
   if(!ref?.session)return;
   highlightChain=highlightChain.catch(()=>{}).then(async()=>{
@@ -63,14 +67,15 @@ $('pause').onclick=async()=>{
     else{await active.resume();if(reader===active)status('Continuando a leitura…');}
   }catch{if(reader===active)stop('Não foi possível retomar o áudio. Clique em Ler para tentar novamente.');}
 };
-$('settingsOpen').onclick=()=>{$('settingsStatus').textContent='';$('settings').showModal();};
+const openSettings=()=>{$('settingsStatus').textContent='';$('settings').showModal();};
+$('settingsOpen').onclick=openSettings;$('setupPrompt').onclick=openSettings;
 $('settingsClose').onclick=()=>$('settings').close();
 $('save').onclick=async()=>{
   const key=$('key').value.trim();
   if(!key.startsWith('sk-') || key.length<20){$('settingsStatus').textContent='Cole uma chave válida da API OpenAI.';return;}
-  await chrome.storage.session.set({apiKey:key});$('key').value='';$('key').placeholder='Chave guardada nesta sessão';$('keyState').textContent='Chave guardada nesta sessão';$('settings').close();status('Chave guardada. Carregue um texto para ouvir.');
+  await chrome.storage.session.set({apiKey:key});$('key').value='';$('key').placeholder='Chave guardada nesta sessão';accessState(true);$('settings').close();status('Chave guardada. Carregue um texto para ouvir.');
 };
-$('forget').onclick=async()=>{stop('Chave removida.');await chrome.storage.session.remove('apiKey');await speechCache.clear().catch(()=>{});$('key').value='';$('key').placeholder='sk-…';$('keyState').textContent='Configure sua chave para ouvir';$('settingsStatus').textContent='Chave removida desta sessão.';};
+$('forget').onclick=async()=>{stop('Chave removida.');await chrome.storage.session.remove('apiKey');await speechCache.clear().catch(()=>{});$('key').value='';$('key').placeholder='sk-…';accessState(false);$('settingsStatus').textContent='Chave removida desta sessão.';};
 $('voice').onchange=()=>chrome.storage.local.set({voice:$('voice').value});
 $('speed').oninput=()=>{
   const rate=Number($('speed').value);$('speedValue').textContent=`${rate}×`;reader?.setRate(rate);chrome.storage.local.set({speed:rate});
@@ -122,7 +127,7 @@ $('play').onclick=async()=>{
   try{
     const {apiKey}=await chrome.storage.session.get('apiKey');await unlocked;
     if(runToken!==token){await context.close();return;}
-    if(!apiKey){await context.close();stop('Guarde sua chave da API antes de iniciar.');$('settings').showModal();return;}
+    if(!apiKey){await context.close();accessState(false);stop('Configure sua chave da API antes de iniciar.');openSettings();return;}
     const voice=$('voice').value;let reused=0,generated=0;
     $('economy').textContent='Verificando áudios já salvos…';
     const cachedSpeech=(text,signal)=>speechCache.get(
@@ -152,7 +157,8 @@ function receiveSelection(selection) {
 }
 chrome.storage.onChanged.addListener((changes,area)=>{if(area==='session' && changes.pendingSelection?.newValue)receiveSelection(changes.pendingSelection.newValue);});
 const [session,prefs]=await Promise.all([chrome.storage.session.get(['apiKey','pendingSelection']),chrome.storage.local.get(['voice','speed'])]);
-if(session.apiKey){$('key').placeholder='Chave guardada nesta sessão';$('keyState').textContent='Chave guardada nesta sessão';}
+if(session.apiKey)$('key').placeholder='Chave guardada nesta sessão';
+accessState(session.apiKey);
 if(voices.includes(prefs.voice))$('voice').value=prefs.voice;
 if(Number.isFinite(prefs.speed))$('speed').value=prefs.speed;
 $('speedValue').textContent=`${$('speed').value}×`;receiveSelection(session.pendingSelection);

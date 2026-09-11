@@ -1,4 +1,4 @@
-# Leitor GPT — versão 1.3.0
+# Leitor GPT — versão 1.4.0
 
 ## Atualizar uma instalação existente
 
@@ -60,8 +60,9 @@ O ícone pessoal combina páginas/folhas, uma linha de leitura e um ponto laranj
 
 Manifesto, HTML, CSS e JavaScript estão em UTF-8. Os textos do cartão de extensão e do painel foram corrigidos. A extensão continua sendo instalada localmente; não foi publicada na Chrome Web Store.
 
-## Verificação da versão 1.3.0
+## Verificação da versão 1.4.0
 
+- Orientação visual: configurações pulsando antes da chave, pausa durante a leitura e parar quando a leitura está pausada.
 - Testes do cache: repetição e reabertura sem novas chamadas, mudança de voz, expiração, limite, remoção, cancelamento e deduplicação.
 - Testes da fila: agrupamento sem perda de texto; limite de preparação; agendamento contínuo; pausa/retomada; mudança de velocidade; cancelamento; leitura até o fim.
 - Testes de página no Chrome: frases com elementos inline, seleção, recuperação pelo texto do menu, destaque de intervalos, rolagem e descarte de posições antigas.
