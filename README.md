@@ -6,7 +6,7 @@
 
 Extensão para Google Chrome, instalada localmente, com geração de fala pela API OpenAI. Selecione um trecho ou carregue a página inteira, confira a prévia e ouça até o fim. O painel e a página acompanham a leitura por frases.
 
-**Chrome 116+ · Manifest V3 · JavaScript · OpenAI TTS · Versão 1.3.0**
+**Chrome 116+ · Manifest V3 · JavaScript · OpenAI TTS · Versão 1.4.0**
 
 [Instalação](#instalação) · [Como usar](#como-usar) · [Economia](#economia-sem-interromper-a-leitura) · [Privacidade](#privacidade-e-permissões) · [Desenvolvimento](#desenvolvimento-e-testes)
 
@@ -31,6 +31,7 @@ Extensão para Google Chrome, instalada localmente, com geração de fala pela A
 - **Acompanhar sem procurar o trecho:** destaque por frases e rolagem automática quando a posição é acessível.
 - **Ler até o fim:** a transição entre os áudios é automática, sem novos cliques.
 - **Ajustar o ritmo:** pause, continue, pare e altere a velocidade entre 0,5× e 2×.
+- **Encontrar a próxima ação:** a interface destaca configurar, pausar ou parar conforme o momento da leitura.
 - **Reutilizar áudios:** repita o mesmo conteúdo com a mesma voz sem nova chamada à API enquanto o áudio estiver no cache.
 
 ## Instalação
