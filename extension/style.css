@@ -8,4 +8,31 @@ body{height:100dvh;display:grid;grid-template-rows:auto minmax(0,1fr) auto;overf
 .player-actions .ds-button{width:auto}
 
 /* Uma única ação recebe ênfase em cada etapa: configurar, pausar ou parar. */
-.app-header .settings-button{width:auto}.settings-button{min-height:44px;padding:9px 13px;font-size:11px;white-space:nowrap;background:var(--bg-surface);border-color:var(--border-default)}.settings-button.needs-attention{background:var(--accent-primary);border-color:var(--accent-primary);color:var(--color-white)}.settings-button svg{width:18px;height:18px}.setup-note{width:100%;display:flex;align-items:center;gap:10px;margin:-4px 0 var(--space-5);padding:10px 12px;text-align:left;border:1px solid var(--accent-secondary);border-radius:var(--radius-xs);background:var(--accent-secondary-soft);color:var(--text-primary);cursor:pointer}.setup-note svg{width:21px;height:21px;flex:0 0 21px;fill:none;stroke:var(--accent-secondary);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.setup-note span{font-size:11px;line-height:1.4}.setup-note strong{display:block;font-size:10px;letter-spacing:.04em;text-transform:uppercase}.stop-button{width:auto;flex:0 0 auto;min-height:46px;padding-inline:15px;background:var(--bg-surface);border-color:var(--border-strong);color:var(--text-primary)}.stop-button svg{width:17px;height:17px}.needs-attention,body[data-reader-state="playing"] #pause,body[data-reader-state="paused"] #stop{position:relative;isolation:isolate}.needs-attention::after,body[data-reader-state="playing"] #pause::after,body[data-reader-state="paused"] #stop::after{content:"";position:absolute;inset:-4px;border:2px solid var(--accent-secondary);border-radius:inherit;pointer-events:none;animation:action-pulse 1.55s ease-out infinite}@keyframes action-pulse{0%{opacity:.85;transform:scale(.97)}75%,100%{opacity:0;transform:scale(1.09)}}@media(max-width:330px){.settings-button{padding-inline:10px}.settings-button span{font-size:10px}.setup-note{margin-top:-8px}}@media(max-width:300px){.app-header{padding-inline:12px}.ds-brand{gap:8px}.ds-brand img{width:34px;height:34px;flex-basis:34px}.brand-meta{display:none}.settings-button{padding-inline:9px}}@media(prefers-reduced-motion:reduce){.needs-attention::after,body[data-reader-state="playing"] #pause::after,body[data-reader-state="paused"] #stop::after{animation:none;opacity:1;inset:-3px}}
+.app-header .settings-button{width:auto}
+.settings-button{min-height:44px;padding:9px 13px;font-size:11px;white-space:nowrap;background:var(--bg-surface);border-color:var(--border-default)}
+.settings-button.needs-attention{background:var(--accent-primary);border-color:var(--accent-primary);color:var(--color-white)}
+.settings-button svg{width:18px;height:18px}
+.setup-note{width:100%;display:flex;align-items:center;gap:10px;margin:-4px 0 var(--space-5);padding:10px 12px;text-align:left;border:1px solid var(--accent-secondary);border-radius:var(--radius-xs);background:var(--accent-secondary-soft);color:var(--text-primary);cursor:pointer}
+.setup-note svg{width:21px;height:21px;flex:0 0 21px;fill:none;stroke:var(--accent-secondary);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.setup-note span{font-size:11px;line-height:1.4}
+.setup-note strong{display:block;font-size:10px;letter-spacing:.04em;text-transform:uppercase}
+
+/* A segunda ação é um botão completo, nunca um círculo com o texto vazando. */
+.player-actions{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;align-items:stretch}
+body[data-reader-state="playing"] .player-actions,
+body[data-reader-state="paused"] .player-actions{grid-template-columns:minmax(0,1fr) minmax(96px,auto)}
+.player-actions .ds-button{width:100%;min-width:0;white-space:nowrap}
+#stop.stop-button{width:auto;min-width:96px;min-height:46px;padding-inline:14px;border-radius:var(--radius-pill);background:var(--bg-surface);border-color:var(--border-strong);color:var(--text-primary)}
+.stop-button svg{width:17px;height:17px}
+
+/* Pulso no próprio botão: brilho, cor e escala tornam a animação perceptível. */
+.needs-attention,
+body[data-reader-state="playing"] #pause,
+body[data-reader-state="paused"] #stop{position:relative;z-index:1;animation:action-blink 1.15s ease-in-out infinite;will-change:box-shadow,filter}
+@keyframes action-blink{
+  0%,100%{box-shadow:0 0 0 0 rgb(240 106 42 / 0);filter:brightness(1)}
+  50%{box-shadow:0 0 0 2px var(--bg-surface),0 0 0 5px rgb(240 106 42 / .82);filter:brightness(1.16)}
+}
+@media(max-width:330px){.settings-button{padding-inline:10px}.settings-button span{font-size:10px}.setup-note{margin-top:-8px}.player-actions{gap:8px}body[data-reader-state="playing"] .player-actions,body[data-reader-state="paused"] .player-actions{grid-template-columns:minmax(0,1fr) minmax(90px,auto)}#stop.stop-button{min-width:90px;padding-inline:11px}}
+@media(max-width:300px){.app-header{padding-inline:12px}.ds-brand{gap:8px}.ds-brand img{width:34px;height:34px;flex-basis:34px}.brand-meta{display:none}.settings-button{padding-inline:9px}}
+@media(prefers-reduced-motion:reduce){.needs-attention,body[data-reader-state="playing"] #pause,body[data-reader-state="paused"] #stop{animation-duration:1.8s}}
