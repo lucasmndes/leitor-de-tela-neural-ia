@@ -1,4 +1,4 @@
-# Leitor GPT — versão 1.4.1
+# Leitor GPT — versão 1.5.0
 
 ## Atualizar uma instalação existente
 
@@ -26,7 +26,7 @@ O acompanhamento por frases é uma estimativa baseada na duração do áudio e n
 
 ## Configurar a API
 
-Obtenha uma chave em https://platform.openai.com/api-keys e configure o acesso pago à API. O modelo `gpt-4o-mini-tts` não está disponível no Free tier da API. A cobrança da API é separada de planos do ChatGPT.
+Obtenha uma chave em https://platform.openai.com/api-keys e configure o acesso pago à API. O projeto e a chave precisam permitir a Realtime API e o modelo `gpt-realtime-2.1-mini`. A cobrança da API é separada de planos do ChatGPT.
 
 Abra o botão de configurações no canto superior direito, insira a chave e clique em **Guardar chave**. Ela fica somente no armazenamento de sessão da extensão, sem sincronização e sem acesso pelos scripts dos sites. Use **Esquecer** para removê-la. Encerrar completamente o Chrome também encerra essa sessão; processos em segundo plano podem mantê-la ativa.
 
@@ -34,11 +34,11 @@ Não compartilhe sua chave em conversas e não coloque chaves no código. Nenhum
 
 ## Vozes
 
-Ember não está disponível na API pública de fala. A extensão oferece as vozes próprias da API: Cedar, Marin, Alloy, Ash, Ballad, Coral, Echo, Fable, Onyx, Nova, Sage, Shimmer e Verse. Nenhuma é apresentada como equivalente à Ember.
+Ember não está disponível na API pública de fala. A extensão oferece as vozes aceitas pelo modelo atual: Cedar, Marin, Alloy, Ash, Ballad, Coral, Echo, Sage, Shimmer e Verse. Nenhuma é apresentada como equivalente à Ember.
 
 ## Dados, custos e compatibilidade
 
-O áudio é sintético e gerado online pela OpenAI. A captura e a prévia são locais; o envio começa somente ao clicar em Ler. A extensão solicita apenas a API da OpenAI, sem servidor intermediário ou telemetria.
+O áudio é sintético e gerado online pela OpenAI. A captura e a prévia são locais; o envio começa somente ao clicar em Ler. A extensão solicita uma credencial temporária e usa a Realtime API diretamente, sem servidor intermediário ou telemetria.
 
 A fila mantém no máximo o áudio atual e o próximo. A antecipação considera o tempo observado de geração e o ritmo escolhido. Não é necessário clicar de novo para continuar o texto. Uma chamada em andamento pode terminar durante uma pausa. Parar aborta chamadas em andamento, mas não desfaz processamento ou cobrança já ocorridos.
 
@@ -60,7 +60,11 @@ O ícone pessoal combina páginas/folhas, uma linha de leitura e um ponto laranj
 
 Manifesto, HTML, CSS e JavaScript estão em UTF-8. Os textos do cartão de extensão e do painel foram corrigidos. A extensão continua sendo instalada localmente; não foi publicada na Chrome Web Store.
 
-## Verificação da versão 1.4.1
+## Compatibilidade da API
+
+A versão 1.5.0 migra de `gpt-4o-mini-tts`, com encerramento anunciado para 6 de janeiro de 2027, para `gpt-realtime-2.1-mini`. Modelo, conexão, formato, vozes, instruções e versão do cache ficam concentrados em `speech.js`. Erros de modelo retirado ou não encontrado orientam a atualizar a extensão e ocultam qualquer chave presente na resposta.
+
+## Verificação da versão 1.5.0
 
 - Orientação visual: configurações piscando antes da chave, pausa durante a leitura e parar quando a leitura está pausada. A pulsação é animada e mantém os botões dentro da largura do painel.
 - Testes do cache: repetição e reabertura sem novas chamadas, mudança de voz, expiração, limite, remoção, cancelamento e deduplicação.
@@ -68,11 +72,13 @@ Manifesto, HTML, CSS e JavaScript estão em UTF-8. Os textos do cartão de exten
 - Testes de página no Chrome: frases com elementos inline, seleção, recuperação pelo texto do menu, destaque de intervalos, rolagem e descarte de posições antigas.
 - Testes da interface no Chrome: reprodução Web Audio com áudio de teste, conclusão em 100%, configurações, pausa e layout estreito.
 - Validação da sintaxe, codificação UTF-8, ícones e arquivos referenciados no manifesto.
+- Testes da Realtime API simulada: credencial efêmera, eventos, áudio PCM/WAV, cancelamento e mensagens de descontinuação.
 
 Esses testes usam áudio local e respostas simuladas. Não houve chamada paga nem uso de chave pessoal durante o desenvolvimento desta versão. A qualidade da voz e a latência real dependem da API e da conexão.
 
 ## Referências
 
-- https://developers.openai.com/api/docs/guides/text-to-speech
-- https://developers.openai.com/api/docs/models/gpt-4o-mini-tts
+- https://developers.openai.com/api/docs/deprecations
+- https://developers.openai.com/api/docs/models/gpt-realtime-2.1-mini
+- https://developers.openai.com/api/docs/guides/voice-websockets
 - https://developer.chrome.com/docs/extensions/reference/api/sidePanel

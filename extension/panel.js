@@ -1,11 +1,10 @@
 import {splitText,buildChunks} from './text.js';
 import {ContinuousReader} from './playback.js';
 import {SpeechCache} from './cache.js';
+import {createSpeech,speechCacheKey,SUPPORTED_VOICES} from './speech.js';
 const speechCache=new SpeechCache();void speechCache.cleanup();
-const MODEL='gpt-4o-mini-tts';
-const SPEECH_INSTRUCTIONS='Read verbatim, calmly. Use Brazilian Portuguese for Portuguese text.';
 const $=id=>document.getElementById(id);
-const voices=['cedar','marin','alloy','ash','ballad','coral','echo','fable','onyx','nova','sage','shimmer','verse'];
+const voices=[...SUPPORTED_VOICES];
 for(const voice of voices)$('voice').add(new Option(voice[0].toUpperCase()+voice.slice(1),voice));
 let units=[],chunks=[],pageRef=null,reader=null,token=0,running=false,paused=false,currentCue=null,loadSerial=0,hasApiKey=false;
 let lastSelection,highlightChain=Promise.resolve();
@@ -98,23 +97,6 @@ async function load(mode) {
   finally{if(serial===loadSerial){$('selection').disabled=$('page').disabled=false;controls();}}
 }
 $('selection').onclick=()=>load('selection');$('page').onclick=()=>load('page');
-async function requestSpeech(text,key,voice,signal) {
-  const controller=new AbortController();const cancel=()=>controller.abort();
-  signal.addEventListener('abort',cancel,{once:true});if(signal.aborted)cancel();
-  const timeout=setTimeout(cancel,90000);
-  try {
-    const response=await fetch('https://api.openai.com/v1/audio/speech',{
-      method:'POST',signal:controller.signal,headers:{'Content-Type':'application/json',Authorization:`Bearer ${key}`},
-      body:JSON.stringify({model:MODEL,voice,input:text,response_format:'mp3',instructions:SPEECH_INSTRUCTIONS})
-    });
-    if(!response.ok){
-      const messages={401:'Chave inválida ou revogada.',403:'Acesso negado. Confira o acesso pago à API e as permissões da chave e do projeto.',429:'Limite da API atingido ou saldo indisponível.'};
-      let detail='';try{const body=await response.json();detail=String(body.error?.message || '').split(key).join('[chave ocultada]').replace(/sk-[A-Za-z0-9_-]+/g,'[chave ocultada]').slice(0,700);}catch{}
-      throw new Error(`${messages[response.status] || 'Falha ao gerar áudio.'} HTTP ${response.status}.${detail ? ` Detalhe: ${detail}` : ''}`);
-    }
-    return await response.arrayBuffer();
-  }finally{clearTimeout(timeout);signal.removeEventListener('abort',cancel);}
-}
 $('clearAudio').onclick=async()=>{
   stop('Leitura parada para limpar os áudios.');
   try{await speechCache.clear();$('settingsStatus').textContent='Áudios locais removidos.';$('economy').textContent='Novos áudios serão gerados quando necessário.';}catch{$('settingsStatus').textContent='Não foi possível limpar o armazenamento local. Tente novamente.';}
@@ -131,8 +113,8 @@ $('play').onclick=async()=>{
     const voice=$('voice').value;let reused=0,generated=0;
     $('economy').textContent='Verificando áudios já salvos…';
     const cachedSpeech=(text,signal)=>speechCache.get(
-      [1,apiKey,MODEL,voice,SPEECH_INSTRUCTIONS,'mp3',text],
-      ()=>requestSpeech(text,apiKey,voice,signal),signal,kind=>{
+      speechCacheKey(apiKey,voice,text),
+      ()=>createSpeech(text,apiKey,voice,signal),signal,kind=>{
         if(runToken!==token)return;
         if(kind==='reused')reused++;else generated++;
         $('economy').textContent=`${reused} reutilizado${reused===1?'':'s'} · ${generated} novo${generated===1?'':'s'} nesta leitura`;
@@ -160,5 +142,6 @@ const [session,prefs]=await Promise.all([chrome.storage.session.get(['apiKey','p
 if(session.apiKey)$('key').placeholder='Chave guardada nesta sessão';
 accessState(session.apiKey);
 if(voices.includes(prefs.voice))$('voice').value=prefs.voice;
+else $('voice').value='cedar';
 if(Number.isFinite(prefs.speed))$('speed').value=prefs.speed;
 $('speedValue').textContent=`${$('speed').value}×`;receiveSelection(session.pendingSelection);

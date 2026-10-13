@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Leitor GPT — leitura em voz alta",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "Ouça seleções ou páginas com vozes da OpenAI. Acompanhe a leitura com destaque e rolagem por frases.",
   "minimum_chrome_version": "116",
   "permissions": [
@@ -28,7 +28,7 @@
     "default_path": "panel.html"
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'none'; connect-src https://api.openai.com; media-src 'self' blob:"
+    "extension_pages": "script-src 'self'; object-src 'none'; connect-src https://api.openai.com wss://api.openai.com; media-src 'self' blob:"
   },
   "icons": {
     "16": "icons/icon-16.png",

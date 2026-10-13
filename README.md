@@ -6,7 +6,7 @@
 
 Extensão para Google Chrome, instalada localmente, com geração de fala pela API OpenAI. Selecione um trecho ou carregue a página inteira, confira a prévia e ouça até o fim. O painel e a página acompanham a leitura por frases.
 
-**Chrome 116+ · Manifest V3 · JavaScript · OpenAI TTS · Versão 1.4.1**
+**Chrome 116+ · Manifest V3 · JavaScript · OpenAI Realtime · Versão 1.5.0**
 
 [Instalação](#instalação) · [Como usar](#como-usar) · [Economia](#economia-sem-interromper-a-leitura) · [Privacidade](#privacidade-e-permissões) · [Desenvolvimento](#desenvolvimento-e-testes)
 
@@ -54,12 +54,12 @@ Substitua os arquivos da pasta instalada pelos da nova versão. Em `chrome://ext
 
 ## Configurar a OpenAI
 
-Você precisa de uma chave pessoal com acesso ao modelo **`gpt-4o-mini-tts`**. A API exige internet e tem cobrança própria, separada de planos do ChatGPT. O modelo não está disponível no Free tier da API. Consulte a [documentação do modelo](https://developers.openai.com/api/docs/models/gpt-4o-mini-tts).
+Você precisa de uma chave pessoal com acesso ao modelo **`gpt-realtime-2.1-mini`**. A API exige internet e tem cobrança própria, separada de planos do ChatGPT. Consulte a [documentação do modelo](https://developers.openai.com/api/docs/models/gpt-realtime-2.1-mini).
 
 1. Configure o uso pago na [plataforma OpenAI](https://platform.openai.com/settings/organization/billing/overview).
 2. Crie uma chave em [API keys](https://platform.openai.com/api-keys), no projeto que vai utilizar.
-3. Nas permissões da chave, use **Restricted → Model capabilities → Text-to-speech (`/v1/audio/speech`) → Request**. A extensão não precisa de acesso às demais APIs. Uma chave **Read only** não permite gerar fala.
-4. Confira se o projeto permite `gpt-4o-mini-tts` em **Settings → Limits → Allowed models**.
+3. Nas permissões da chave, permita a criação de credenciais de cliente para a **Realtime API**. Uma chave somente para leitura não permite gerar fala.
+4. Confira se o projeto permite `gpt-realtime-2.1-mini` em **Settings → Limits → Allowed models**.
 5. No painel da extensão, abra o botão de configurações, insira a chave e clique em **Guardar chave**.
 
 Alterações nas permissões podem levar alguns minutos para entrar em vigor. A chave fica guardada somente durante a sessão do Chrome, sem sincronização. Use **Esquecer** para removê-la.
@@ -107,7 +107,7 @@ flowchart LR
 
 ### O que reduz o consumo
 
-- **Cache local de áudio:** o mesmo texto, voz, modelo, instruções e chave identificam uma gravação reutilizável. Reabrir o painel não perde esse cache.
+- **Cache local de áudio:** o mesmo texto, voz, perfil de integração, modelo, instruções e chave identificam uma gravação reutilizável. Reabrir o painel não perde esse cache.
 - **Preparação controlada:** fica em memória o áudio atual e, no máximo, o próximo. A próxima geração começa perto da transição, considerando a latência observada e a velocidade de reprodução.
 - **Instruções menores:** a API recebe uma orientação curta e o texto necessário, sem histórico de conversa, HTML ou imagem da página.
 - **Processamento local:** seleção, divisão de texto, destaque, rolagem e velocidade não chamam modelos.
@@ -117,11 +117,11 @@ O cache é limitado a **64 MB e 200 áudios**. Um áudio pode ser reutilizado po
 
 **Resultado do teste de integração:** a primeira leitura do texto de demonstração fez 2 chamadas simuladas. Repetir, reabrir o painel e mudar o ritmo fizeram **zero novas chamadas** para os mesmos áudios. Isso comprova o reaproveitamento; não é uma promessa de redução percentual para qualquer conteúdo.
 
-Conteúdo novo, outra voz, cache expirado/limpo ou itens removidos ainda exigem geração normal. O custo da primeira leitura continua dependendo do texto e do áudio produzidos. O painel informa quantos áudios foram novos ou reutilizados, sem inventar uma contagem de tokens. Veja os [custos do modelo](https://developers.openai.com/api/docs/models/gpt-4o-mini-tts).
+Conteúdo novo, outra voz, cache expirado/limpo ou itens removidos ainda exigem geração normal. O custo da primeira leitura continua dependendo do texto e do áudio produzidos. O painel informa quantos áudios foram novos ou reutilizados, sem inventar uma contagem de tokens. Veja os [custos do modelo](https://developers.openai.com/api/docs/models/gpt-realtime-2.1-mini).
 
 ## Vozes disponíveis
 
-Cedar, Marin, Alloy, Ash, Ballad, Coral, Echo, Fable, Onyx, Nova, Sage, Shimmer e Verse. Cedar é a escolha inicial.
+Cedar, Marin, Alloy, Ash, Ballad, Coral, Echo, Sage, Shimmer e Verse. Cedar é a escolha inicial.
 
 **Ember não está disponível na API pública utilizada.** As vozes acima não são apresentadas como equivalentes à Ember. Consulte as [opções oficiais de fala](https://developers.openai.com/api/docs/guides/text-to-speech).
 
@@ -129,10 +129,10 @@ Cedar, Marin, Alloy, Ash, Ballad, Coral, Echo, Fable, Onyx, Nova, Sage, Shimmer 
 
 | Item | Onde fica / para que serve |
 | --- | --- |
-| Chave da API | `chrome.storage.session`, restrito aos contextos da extensão. Não entra no código nem no IndexedDB. |
+| Chave da API | `chrome.storage.session`, restrito aos contextos da extensão. É usada para solicitar uma credencial efêmera e não entra no código nem no IndexedDB. |
 | Texto capturado | Na memória do painel; enviado à OpenAI somente ao iniciar a leitura. |
 | Áudios reutilizáveis | IndexedDB local. A gravação contém o conteúdo lido; não há sincronização ou servidor intermediário. |
-| Identificador do cache | Hash SHA-256 dos parâmetros e da chave. Não armazena o texto ou a chave em formato legível. |
+| Identificador do cache | Hash SHA-256 do perfil de integração, parâmetros e chave. Não armazena o texto ou a chave em formato legível. |
 | Voz e ritmo | `chrome.storage.local`. |
 
 Permissões do Chrome: `activeTab` para acesso temporário à aba acionada; `scripting` para captura e destaque; `sidePanel` para o painel; `contextMenus` para a seleção pelo botão direito; `storage` para preferências e chave. A única permissão de servidor é **`https://api.openai.com/*`**.
@@ -151,7 +151,8 @@ Não há telemetria, chamadas a modelos de chat ou envio automático da página 
 
 | Situação | Verifique |
 | --- | --- |
-| HTTP 403 / projeto sem acesso ao modelo | Nível de uso da organização, modelos permitidos no projeto e permissão **Text-to-speech → Request** da chave. |
+| HTTP 403 / projeto sem acesso ao modelo | Nível de uso da organização, `gpt-realtime-2.1-mini` entre os modelos permitidos e acesso da chave à Realtime API. |
+| Modelo retirado ou não encontrado | Atualize a extensão. Erros de descontinuação, HTTP 404 e HTTP 410 mostram uma orientação própria, sem expor a chave. |
 | HTTP 401 | Chave inválida ou revogada; substitua nas configurações. |
 | HTTP 429 | Saldo e limites de uso na plataforma OpenAI. |
 | Texto não aparece | Clique no ícone da extensão nessa aba ou use o botão direito na seleção. |
@@ -168,6 +169,7 @@ extension/
 ├── background.js       # Menu de contexto e captura inicial
 ├── panel.html          # Painel lateral e configurações
 ├── panel.js            # Estado da interface e chamadas TTS
+├── speech.js           # Perfil da API, Realtime, áudio PCM/WAV e erros
 ├── extract.js          # Texto, posições DOM, destaque e rolagem
 ├── text.js             # Frases e agrupamento para geração
 ├── playback.js         # Web Audio, fila, ritmo e pausa
@@ -178,12 +180,20 @@ extension/
 └── icons/              # SVG original e PNGs do ícone
 ```
 
-- **Modelo:** `gpt-4o-mini-tts`, via `POST /v1/audio/speech`, áudio MP3.
+- **Modelo:** `gpt-realtime-2.1-mini`. A extensão cria uma credencial efêmera em `POST /v1/realtime/client_secrets` e abre `WSS /v1/realtime` somente durante a geração.
+- **Áudio:** deltas PCM16 mono a 24 kHz são reunidos em WAV localmente para reprodução e cache.
+- **Compatibilidade:** modelo, transporte, versão do cache, formato, vozes e instruções ficam centralizados em `speech.js`. Uma futura migração muda essa camada sem misturar a API com a interface e a fila.
 - **Texto:** normalização de espaços, segmentação por frases e trechos visuais de até aproximadamente 220 caracteres; grupos de até aproximadamente 1.400 caracteres por geração.
 - **Reprodução:** `AudioContext` e `AudioBufferSourceNode` agendados no mesmo relógio para reduzir intervalos entre arquivos.
 - **Acompanhamento:** `Range`, CSS Custom Highlight API e identificação da sessão/documento para evitar reutilizar posições antigas.
 - **Cancelamento:** `AbortController`; pausa suspende o contexto de áudio e bloqueia novas preparações. Uma chamada que já começou pode terminar durante a pausa e ter seu áudio guardado.
 - **Codificação:** UTF-8 em manifesto, interface e documentação.
+
+## Política de compatibilidade da API
+
+A versão 1.5.0 remove a dependência de `gpt-4o-mini-tts`, descontinuado para 6 de janeiro de 2027, e adota o substituto indicado pela OpenAI. O cache possui uma versão de esquema: quando modelo, transporte ou formato mudam, gravações incompatíveis não são reutilizadas por engano. Respostas da API são classificadas por autenticação, permissão, limite e descontinuação; detalhes são higienizados antes de aparecer na tela.
+
+Não é seguro trocar automaticamente para qualquer modelo disponível: preço, vozes, formato e comportamento podem mudar. A estratégia é manter uma única configuração auditável em `speech.js`, testar o novo perfil e publicar uma atualização antes da data de encerramento anunciada na [página oficial de descontinuações](https://developers.openai.com/api/docs/deprecations).
 
 ## Desenvolvimento e testes
 
